@@ -1,0 +1,20 @@
+{
+  "creativetab.funny_cat_stick.funny_cat_stick": "Funny Cat Stick",
+  "item.funny_cat_stick.funny_cat_stick": "Funny Cat Stick",
+  "message.funny_cat_stick.tamed.0": "%1$s has been tamed! Their owner is %2$s, meow!",
+  "message.funny_cat_stick.tamed.1": "%2$s waved the Funny Cat Stick, and now %1$s must behave, meow~",
+  "message.funny_cat_stick.tamed.2": "Ding! %1$s has accepted %2$s as their owner. Take good care of this kitty!",
+  "message.funny_cat_stick.tamed.3": "%1$s is wearing an invisible kitty collar. Their owner is %2$s, meow~",
+  "message.funny_cat_stick.tamed.4": "Congratulations to %2$s for taming %1$s. Be a good kitty now!",
+  "message.funny_cat_stick.remaining.20_minutes": "Your owner's mark will last for another 20 minutes, meow~",
+  "message.funny_cat_stick.remaining.10_minutes": "Only 10 minutes remain before you must say goodbye to your owner, meow...",
+  "message.funny_cat_stick.remaining.5_minutes": "Only 5 minutes remain. Treasure your time with your owner, meow~",
+  "message.funny_cat_stick.remaining.1_minute": "One final minute, meow. You are about to lose your owner...",
+  "message.funny_cat_stick.remaining.10_seconds": "Only 10 seconds remain! I don't want to leave my owner, meow!",
+  "message.funny_cat_stick.expired": "I lost my owner, meow~ I hope I get another chance, meow~",
+  "command.funny_cat_stick.invalid_duration": "Invalid duration '%s'. Use s, m, h, or d, such as 30m or 1h.",
+  "command.funny_cat_stick.tame.success": "Applied the Funny Cat Stick effect to %s player(s).",
+  "command.funny_cat_stick.query.active": "%1$s has %2$s remaining.",
+  "command.funny_cat_stick.query.inactive": "%s has no Funny Cat Stick effect.",
+  "command.funny_cat_stick.reduce.success": "%1$s now has %2$s remaining."
+}
