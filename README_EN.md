@@ -2,38 +2,45 @@
 
 English | [简体中文](README.md)
 
-Funny Cat Stick is a multiplayer prank mod for Minecraft Forge 1.20.1.
+Funny Cat Stick is a multiplayer prank mod for Minecraft 1.20.1 Forge. Its single-use stick affects another player and temporarily adds a catgirl personality to their chat messages.
 
-## Requirements
+## Features
 
-- Minecraft 1.20.1
-- Forge 47.4.10 or a compatible Forge 47.x release
-- Java 17
-- Required on both the client and dedicated server
+- The non-stackable Funny Cat Stick is consumed when used on another player and applies a 30-minute effect.
+- The target's original message is preserved while personality-specific phrases or emoticons are added.
+- Effects persist through death and reconnects, with reminders at 20, 10, 5, and 1 minute and 10 seconds remaining.
+- Using a stick broadcasts the owner and target to the server.
+- Ordinary chest loot has an approximately 0.6% chance to gain one additional Funny Cat Stick.
+- Simplified Chinese and English are supported.
 
-## What's new in 0.1.0
+## What's new in 0.2.0
 
-- Added the single-use, non-stackable Funny Cat Stick with no durability bar.
-- Added a dedicated Funny Cat Stick creative-mode tab.
-- Using the stick on another player consumes it and applies a 30-minute prank effect.
-- While affected, a player's chat messages receive random cute phrases or emoticons without altering their original words.
-- Using the item broadcasts one of five random taming messages with the owner and target names.
-- The affected player receives reminders at 20 minutes, 10 minutes, 5 minutes, 1 minute, and 10 seconds remaining.
-- The effect cannot be removed by ordinary methods such as milk and persists through death and reconnects.
-- Every loaded `chests/*` loot table has an approximately 0.6% chance to add one Funny Cat Stick, with at most one added per generation.
-- Added OP commands for applying, querying, and reducing effect duration.
-- Added a development-only command that statistically tests the real loot-generation pipeline.
-- Added English and Simplified Chinese localization and a vanilla-style 16×16 item texture.
+- Added personality enchantments that can only be applied to the Funny Cat Stick. Each changes the target's chat style.
+- Added nine normal personalities: Tough, Yandere, Tsundere, Energetic, Lazy, Sharp-Tongued, Timid, Airheaded, and Nekomata Deity.
+- Normal personality enchantments are available through vanilla-style sources such as enchanting tables, villager trades, fishing, and enchanted-book loot. The stick can only receive these normal enchantments at an enchanting table.
+- Added the treasure enchantment Ji Ni Tai Mei Catgirl. Its enchanted book is currently available only as a rare open-water fishing reward.
+- Personality enchantments are mutually exclusive. A target's active personality is determined by the most recent stick used on them.
+- Ji Ni Tai Mei messages may receive a prefix, suffix, or both.
+- Ji Ni Tai Mei sticks can play a dedicated track only for the owner and target. This server-wide feature is disabled by default and controlled by administrators.
+- Fixed full enchanting tables incorrectly reporting limited enchanting power and locking options.
 
 ## Administrator commands
 
-These commands require permission level 2 or above. Durations support `s`, `m`, `h`, and `d`.
+These commands require permission level 2 or above. Player arguments support vanilla selectors. Durations support `s`, `m`, `h`, and `d`, such as `30m` or `1h`.
 
 ```text
 /funnycatstick tame <owner> <targets> <duration>
 /funnycatstick query <targets>
 /funnycatstick reduce <targets> <duration>
+/funnycatstick music
+/funnycatstick music <true|false>
 ```
+
+- `tame`: applies the classic Funny Cat Stick effect to the targets.
+- `query`: reports the targets' remaining effect duration.
+- `reduce`: reduces the targets' remaining effect duration.
+- `music`: reports the server-wide Ji Ni Tai Mei music setting.
+- `music true|false`: enables or disables music playback. It defaults to `false` and is saved with the current world.
 
 Examples:
 
@@ -41,13 +48,17 @@ Examples:
 /funnycatstick tame PlayerA PlayerB 30m
 /funnycatstick query @a
 /funnycatstick reduce PlayerB 5m
+/funnycatstick music true
 ```
 
-## Installation
+## Requirements and installation
 
-1. Install Minecraft 1.20.1 and Forge 47.4.10.
-2. Place `funny_cat_stick-0.1.0.jar` from the release page in both the client and server `mods` directories.
-3. Start the client and server with the same mod version.
+- Minecraft 1.20.1
+- Forge 47.4.10
+- Java 17
+- The same mod version installed on both client and server
+
+Place `funny_cat_stick-0.2.0.jar` from the release page in both the client and server `mods` directories, then start the game.
 
 ## Development and testing
 
@@ -59,7 +70,7 @@ Examples:
 .\gradlew.bat stopLocalServer
 ```
 
-The local test players `DevPlayer1` and `DevPlayer2` automatically receive operator level 4 before `runServer` starts. See [MULTIPLAYER_TESTING.md](MULTIPLAYER_TESTING.md) for details.
+See [MULTIPLAYER_TESTING.md](MULTIPLAYER_TESTING.md) for multiplayer testing details.
 
 ## License
 

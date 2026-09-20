@@ -1,9 +1,11 @@
 package io.github.bingehanpi.funny_cat_stick.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import io.github.bingehanpi.funny_cat_stick.config.ModServerConfig;
 import io.github.bingehanpi.funny_cat_stick.effect.CatChatEffect;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -57,7 +59,14 @@ public final class FunnyCatStickCommands {
                                                 context.getSource(),
                                                 EntityArgument.getPlayers(context, "targets"),
                                                 parseDuration(context, "duration")
-                                        ))))));
+                                        )))))
+                .then(Commands.literal("music")
+                        .executes(context -> queryMusic(context.getSource()))
+                        .then(Commands.argument("enabled", BoolArgumentType.bool())
+                                .executes(context -> setMusic(
+                                        context.getSource(),
+                                        BoolArgumentType.getBool(context, "enabled")
+                                )))));
     }
 
     private static int tame(
@@ -129,6 +138,32 @@ public final class FunnyCatStickCommands {
             }
         }
         return targets.size();
+    }
+
+    private static int queryMusic(CommandSourceStack source) {
+        boolean enabled = ModServerConfig.isIkunMusicEnabled();
+        source.sendSuccess(
+                () -> Component.translatable(
+                        enabled
+                                ? "command.funny_cat_stick.music.status.enabled"
+                                : "command.funny_cat_stick.music.status.disabled"
+                ),
+                false
+        );
+        return 1;
+    }
+
+    private static int setMusic(CommandSourceStack source, boolean enabled) {
+        ModServerConfig.setIkunMusicEnabled(enabled);
+        source.sendSuccess(
+                () -> Component.translatable(
+                        enabled
+                                ? "command.funny_cat_stick.music.set.enabled"
+                                : "command.funny_cat_stick.music.set.disabled"
+                ),
+                true
+        );
+        return 1;
     }
 
     private static long parseDuration(com.mojang.brigadier.context.CommandContext<CommandSourceStack> context, String argumentName)

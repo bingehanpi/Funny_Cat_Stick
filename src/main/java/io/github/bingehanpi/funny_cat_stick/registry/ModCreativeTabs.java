@@ -4,6 +4,8 @@ import io.github.bingehanpi.funny_cat_stick.FunnyCatStick;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -18,7 +20,15 @@ public final class ModCreativeTabs {
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("creativetab.funny_cat_stick.funny_cat_stick"))
                     .icon(() -> ModItems.FUNNY_CAT_STICK.get().getDefaultInstance())
-                    .displayItems((parameters, output) -> output.accept(ModItems.FUNNY_CAT_STICK.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(ModItems.FUNNY_CAT_STICK.get());
+                        for (RegistryObject<net.minecraft.world.item.enchantment.Enchantment> enchantment
+                                : ModEnchantments.PERSONALITY_ENCHANTMENTS) {
+                            output.accept(EnchantedBookItem.createForEnchantment(
+                                    new EnchantmentInstance(enchantment.get(), 1)
+                            ));
+                        }
+                    })
                     .build()
     );
 

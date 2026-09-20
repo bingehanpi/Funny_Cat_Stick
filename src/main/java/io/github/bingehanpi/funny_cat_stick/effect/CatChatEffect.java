@@ -16,6 +16,7 @@ public final class CatChatEffect {
     private static final String LAST_REMAINING_KEY = FunnyCatStick.MOD_ID + "_cat_chat_last_remaining";
     private static final String OWNER_UUID_KEY = FunnyCatStick.MOD_ID + "_cat_chat_owner_uuid";
     private static final String OWNER_NAME_KEY = FunnyCatStick.MOD_ID + "_cat_chat_owner_name";
+    private static final String PERSONALITY_KEY = FunnyCatStick.MOD_ID + "_cat_chat_personality";
     public static final long DEFAULT_DURATION_MILLIS = Duration.ofMinutes(30).toMillis();
     private static final int TAMING_MESSAGE_COUNT = 5;
     private static final long[] REMINDER_THRESHOLDS = {
@@ -37,10 +38,18 @@ public final class CatChatEffect {
     }
 
     public static void apply(Player target, Player owner) {
-        apply(target, owner, DEFAULT_DURATION_MILLIS);
+        apply(target, owner, DEFAULT_DURATION_MILLIS, CatPersonality.CLASSIC);
+    }
+
+    public static void apply(Player target, Player owner, CatPersonality personality) {
+        apply(target, owner, DEFAULT_DURATION_MILLIS, personality);
     }
 
     public static void apply(Player target, Player owner, long durationMillis) {
+        apply(target, owner, durationMillis, CatPersonality.CLASSIC);
+    }
+
+    public static void apply(Player target, Player owner, long durationMillis, CatPersonality personality) {
         CompoundTag data = target.getPersistentData();
         long now = System.currentTimeMillis();
         long expiresAt = durationMillis > Long.MAX_VALUE - now ? Long.MAX_VALUE : now + durationMillis;
@@ -48,6 +57,7 @@ public final class CatChatEffect {
         data.putLong(LAST_REMAINING_KEY, durationMillis);
         data.putUUID(OWNER_UUID_KEY, owner.getUUID());
         data.putString(OWNER_NAME_KEY, owner.getGameProfile().getName());
+        data.putString(PERSONALITY_KEY, personality.getSerializedName());
     }
 
     public static void announceTaming(Player owner, ServerPlayer target) {
@@ -83,6 +93,14 @@ public final class CatChatEffect {
             return 0;
         }
         return Math.max(0, player.getPersistentData().getLong(EXPIRES_AT_KEY) - System.currentTimeMillis());
+    }
+
+    public static CatPersonality getPersonality(Player player) {
+        CompoundTag data = player.getPersistentData();
+        if (!data.contains(PERSONALITY_KEY, Tag.TAG_STRING)) {
+            return CatPersonality.CLASSIC;
+        }
+        return CatPersonality.fromSerializedName(data.getString(PERSONALITY_KEY));
     }
 
     public static long reduce(ServerPlayer player, long amountMillis) {
@@ -156,6 +174,9 @@ public final class CatChatEffect {
             if (originalData.contains(OWNER_NAME_KEY, Tag.TAG_STRING)) {
                 replacementData.putString(OWNER_NAME_KEY, originalData.getString(OWNER_NAME_KEY));
             }
+            if (originalData.contains(PERSONALITY_KEY, Tag.TAG_STRING)) {
+                replacementData.putString(PERSONALITY_KEY, originalData.getString(PERSONALITY_KEY));
+            }
         }
     }
 
@@ -165,6 +186,7 @@ public final class CatChatEffect {
         data.remove(LAST_REMAINING_KEY);
         data.remove(OWNER_UUID_KEY);
         data.remove(OWNER_NAME_KEY);
+        data.remove(PERSONALITY_KEY);
         if (notifyPlayer) {
             player.sendSystemMessage(Component.translatable("message.funny_cat_stick.expired"));
         }

@@ -3,6 +3,7 @@ package io.github.bingehanpi.funny_cat_stick.registry;
 import com.mojang.serialization.Codec;
 import io.github.bingehanpi.funny_cat_stick.FunnyCatStick;
 import io.github.bingehanpi.funny_cat_stick.loot.AddFunnyCatStickLootModifier;
+import io.github.bingehanpi.funny_cat_stick.loot.AddIkunEnchantedBookLootModifier;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -16,6 +17,8 @@ public final class ModLootModifiers {
 
     public static final RegistryObject<Codec<AddFunnyCatStickLootModifier>> ADD_FUNNY_CAT_STICK =
             LOOT_MODIFIERS.register("add_funny_cat_stick", () -> AddFunnyCatStickLootModifier.CODEC);
+    public static final RegistryObject<Codec<AddIkunEnchantedBookLootModifier>> ADD_IKUN_ENCHANTED_BOOK =
+            LOOT_MODIFIERS.register("add_ikun_enchanted_book", () -> AddIkunEnchantedBookLootModifier.CODEC);
 
     private ModLootModifiers() {
     }

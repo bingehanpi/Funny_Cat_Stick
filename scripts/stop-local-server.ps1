@@ -1,3 +1,7 @@
+param(
+    [string]$ServerCommand = 'stop'
+)
+
 $ErrorActionPreference = 'Stop'
 
 $projectDirectory = Split-Path -Parent $PSScriptRoot
@@ -92,8 +96,18 @@ try {
         throw 'RCON authentication failed.'
     }
 
-    Send-RconPacket -Stream $stream -RequestId 2 -PacketType 2 -Body 'stop'
-    Write-Host 'Stop command sent. The server is saving the world and shutting down.'
+    Send-RconPacket -Stream $stream -RequestId 2 -PacketType 2 -Body $ServerCommand
+    $commandResponse = Receive-RconPacket -Stream $stream
+    if ($commandResponse.RequestId -eq -1) {
+        throw 'RCON command failed.'
+    }
+
+    if (-not [string]::IsNullOrEmpty($commandResponse.Body)) {
+        Write-Host $commandResponse.Body
+    }
+    if ($ServerCommand -eq 'stop') {
+        Write-Host 'Stop command sent. The server is saving the world and shutting down.'
+    }
 }
 catch [System.Net.Sockets.SocketException] {
     throw "Cannot connect to the local server RCON port 127.0.0.1:$rconPort. Make sure runServer has reached Done."

@@ -3,6 +3,7 @@ package io.github.bingehanpi.funny_cat_stick.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import io.github.bingehanpi.funny_cat_stick.registry.ModEnchantments;
 import io.github.bingehanpi.funny_cat_stick.registry.ModItems;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -10,7 +11,12 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootDataId;
 import net.minecraft.world.level.storage.loot.LootDataType;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -64,12 +70,24 @@ public final class LootTestCommand {
             throw UNKNOWN_LOOT_TABLE.create(lootTableId);
         }
 
-        LootParams lootParams = new LootParams.Builder(source.getLevel())
-                .withParameter(LootContextParams.ORIGIN, source.getPosition())
-                .create(LootContextParamSets.CHEST);
+        boolean fishingLootTable = BuiltInLootTables.FISHING.equals(lootTableId);
+        LootParams.Builder lootParamsBuilder = new LootParams.Builder(source.getLevel())
+                .withParameter(LootContextParams.ORIGIN, source.getPosition());
+        LootParams lootParams;
+        if (fishingLootTable) {
+            FishingHook fishingHook = new FishingHook(EntityType.FISHING_BOBBER, source.getLevel());
+            lootParams = lootParamsBuilder
+                    .withParameter(LootContextParams.TOOL, new ItemStack(Items.FISHING_ROD))
+                    .withParameter(LootContextParams.THIS_ENTITY, fishingHook)
+                    .create(LootContextParamSets.FISHING);
+        } else {
+            lootParams = lootParamsBuilder.create(LootContextParamSets.CHEST);
+        }
 
         int runsWithFunnyCatStick = 0;
         long totalFunnyCatSticks = 0;
+        int runsWithIkunBook = 0;
+        long totalIkunBooks = 0;
         for (int iteration = 0; iteration < iterations; iteration++) {
             List<ItemStack> generatedLoot = lootTable.getRandomItems(lootParams);
             long generatedInThisRun = generatedLoot.stream()
@@ -80,21 +98,36 @@ public final class LootTestCommand {
                 runsWithFunnyCatStick++;
                 totalFunnyCatSticks += generatedInThisRun;
             }
+
+            long ikunBooksInThisRun = generatedLoot.stream()
+                    .filter(stack -> EnchantmentHelper.getEnchantments(stack)
+                            .containsKey(ModEnchantments.IKUN_CATGIRL.get()))
+                    .mapToLong(ItemStack::getCount)
+                    .sum();
+            if (ikunBooksInThisRun > 0) {
+                runsWithIkunBook++;
+                totalIkunBooks += ikunBooksInThisRun;
+            }
         }
 
         double observedPercentage = runsWithFunnyCatStick * 100.0D / iterations;
+        double observedIkunBookPercentage = runsWithIkunBook * 100.0D / iterations;
         boolean eligibleForInjection = lootTableId.getPath().startsWith("chests/");
         String report = String.format(
                 Locale.ROOT,
-                "Loot table: %s\nIterations: %d\nRuns with Funny Cat Stick: %d\nTotal Funny Cat Stick items: %d\nObserved generation: %.4f%%\nEligible for current chest injection: %s",
+                "Loot table: %s\nIterations: %d\nRuns with Funny Cat Stick: %d\nTotal Funny Cat Stick items: %d\nObserved stick generation: %.4f%%\nEligible for current chest injection: %s\nRuns with IKUN book: %d\nTotal IKUN books: %d\nObserved IKUN book generation: %.4f%%\nEligible for IKUN fishing injection: %s",
                 lootTableId,
                 iterations,
                 runsWithFunnyCatStick,
                 totalFunnyCatSticks,
                 observedPercentage,
-                eligibleForInjection
+                eligibleForInjection,
+                runsWithIkunBook,
+                totalIkunBooks,
+                observedIkunBookPercentage,
+                fishingLootTable
         );
         source.sendSuccess(() -> Component.literal(report), false);
-        return runsWithFunnyCatStick;
+        return fishingLootTable ? runsWithIkunBook : runsWithFunnyCatStick;
     }
 }

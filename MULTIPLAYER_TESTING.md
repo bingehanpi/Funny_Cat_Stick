@@ -51,9 +51,13 @@ IntelliJ 的 Gradle 运行控制台不一定会把键盘输入转发给内部 Mi
 /funnycatstick tame <主人> <目标玩家> <持续时间>
 /funnycatstick query <目标玩家>
 /funnycatstick reduce <目标玩家> <减少时间>
+/funnycatstick music
+/funnycatstick music <true|false>
 ```
 
 目标玩家参数支持原版选择器，例如 `@a`、`@r`、`@p`。主人必须是单个在线玩家，但同样可以使用只会选中一人的原版选择器。
+
+`music` 用于查询或修改全服“及你太美”逗猫棒的音乐播放开关。默认值为 `false`，设置会保存在当前世界的服务端配置中。
 
 示例：
 

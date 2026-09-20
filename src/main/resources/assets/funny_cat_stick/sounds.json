@@ -1,0 +1,10 @@
+{
+  "ikun_music": {
+    "sounds": [
+      {
+        "name": "funny_cat_stick:music/ikun_music",
+        "stream": true
+      }
+    ]
+  }
+}

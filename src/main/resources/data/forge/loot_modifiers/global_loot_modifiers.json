@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-    "funny_cat_stick:add_funny_cat_stick"
+    "funny_cat_stick:add_funny_cat_stick",
+    "funny_cat_stick:add_ikun_enchanted_book"
   ]
 }
