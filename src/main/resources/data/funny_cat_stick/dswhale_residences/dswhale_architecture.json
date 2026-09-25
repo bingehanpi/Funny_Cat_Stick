@@ -1,0 +1,34 @@
+{
+  "template": "funny_cat_stick:dswhale_architecture",
+  "size": [
+    13,
+    9,
+    14
+  ],
+  "home_anchor": [
+    7,
+    2,
+    7
+  ],
+  "resident_spawn": [
+    7,
+    2,
+    7
+  ],
+  "bed_head": [
+    9,
+    2,
+    4
+  ],
+  "entrance": [
+    4,
+    2,
+    9
+  ],
+  "loot_chest": [
+    6,
+    5,
+    4
+  ],
+  "loot_table": "funny_cat_stick:chests/dswhale_architecture"
+}

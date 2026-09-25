@@ -22,6 +22,7 @@ public final class ModCreativeTabs {
                     .icon(() -> ModItems.FUNNY_CAT_STICK.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.FUNNY_CAT_STICK.get());
+                        output.accept(ModItems.DSWHALE_SPAWN_EGG.get());
                         for (RegistryObject<net.minecraft.world.item.enchantment.Enchantment> enchantment
                                 : ModEnchantments.PERSONALITY_ENCHANTMENTS) {
                             output.accept(EnchantedBookItem.createForEnchantment(

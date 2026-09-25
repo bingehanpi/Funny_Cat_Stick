@@ -2,31 +2,23 @@
 
 English | [简体中文](README.md)
 
-Funny Cat Stick is a multiplayer prank mod for Minecraft 1.20.1 Forge. Its single-use stick affects another player and temporarily adds a catgirl personality to their chat messages.
+Funny Cat Stick is a multiplayer content mod for Minecraft 1.20.1 Forge, centered on chat pranks, personality enchantments, and an animated NPC.
 
-## Features
+## Mod content
 
-- The non-stackable Funny Cat Stick is consumed when used on another player and applies a 30-minute effect.
-- The target's original message is preserved while personality-specific phrases or emoticons are added.
-- Effects persist through death and reconnects, with reminders at 20, 10, 5, and 1 minute and 10 seconds remaining.
-- Using a stick broadcasts the owner and target to the server.
-- Ordinary chest loot has an approximately 0.6% chance to gain one additional Funny Cat Stick.
+- The single-use Funny Cat Stick applies a catgirl chat effect to another player while preserving their original message.
+- Personality enchantments change the resulting chat style. The mod includes both normal enchantments obtainable through vanilla-style sources and a special treasure enchantment.
+- Effects persist through death and reconnects and notify affected players as their remaining time approaches zero.
+- A special personality can play dedicated music controlled by server administrators; only the relevant players hear it.
+- Ordinary chest loot has a small chance to gain one additional Funny Cat Stick.
+- Adds the animated NPC `dswhale` (大肥鱼) and a Creative-mode spawn egg. Dswhale supports basic activity, looking, opening doors, returning home, and sleeping at night.
+- Newly generated villages in the `#minecraft:village` structure tag can receive a nearby dswhale residence. This also supports modded villages that correctly use the tag.
+- Each residence contains one home-bound dswhale and a dedicated loot chest.
 - Simplified Chinese and English are supported.
-
-## What's new in 0.2.0
-
-- Added personality enchantments that can only be applied to the Funny Cat Stick. Each changes the target's chat style.
-- Added nine normal personalities: Tough, Yandere, Tsundere, Energetic, Lazy, Sharp-Tongued, Timid, Airheaded, and Nekomata Deity.
-- Normal personality enchantments are available through vanilla-style sources such as enchanting tables, villager trades, fishing, and enchanted-book loot. The stick can only receive these normal enchantments at an enchanting table.
-- Added the treasure enchantment Ji Ni Tai Mei Catgirl. Its enchanted book is currently available only as a rare open-water fishing reward.
-- Personality enchantments are mutually exclusive. A target's active personality is determined by the most recent stick used on them.
-- Ji Ni Tai Mei messages may receive a prefix, suffix, or both.
-- Ji Ni Tai Mei sticks can play a dedicated track only for the owner and target. This server-wide feature is disabled by default and controlled by administrators.
-- Fixed full enchanting tables incorrectly reporting limited enchanting power and locking options.
 
 ## Administrator commands
 
-These commands require permission level 2 or above. Player arguments support vanilla selectors. Durations support `s`, `m`, `h`, and `d`, such as `30m` or `1h`.
+The following release commands require permission level 2 or above. Player arguments support vanilla selectors. Durations support `s`, `m`, `h`, and `d`, such as `30m`, `1h`, or `0.5d`.
 
 ```text
 /funnycatstick tame <owner> <targets> <duration>
@@ -34,13 +26,15 @@ These commands require permission level 2 or above. Player arguments support van
 /funnycatstick reduce <targets> <duration>
 /funnycatstick music
 /funnycatstick music <true|false>
+/fcs locate dswhale_residence
 ```
 
-- `tame`: applies the classic Funny Cat Stick effect to the targets.
-- `query`: reports the targets' remaining effect duration.
-- `reduce`: reduces the targets' remaining effect duration.
+- `tame`: applies the classic Funny Cat Stick effect to one or more targets and assigns the specified player as their owner.
+- `query`: reports the remaining effect duration for one or more targets.
+- `reduce`: reduces the remaining duration for one or more targets; the effect ends when it reaches zero.
 - `music`: reports the server-wide Ji Ni Tai Mei music setting.
 - `music true|false`: enables or disables music playback. It defaults to `false` and is saved with the current world.
+- `fcs locate dswhale_residence`: finds the nearest successfully generated dswhale residence recorded in the current world data and returns clickable coordinates. It does not find residences that have not generated and does not retroactively scan old chunks.
 
 Examples:
 
@@ -49,6 +43,7 @@ Examples:
 /funnycatstick query @a
 /funnycatstick reduce PlayerB 5m
 /funnycatstick music true
+/fcs locate dswhale_residence
 ```
 
 ## Requirements and installation
@@ -56,21 +51,10 @@ Examples:
 - Minecraft 1.20.1
 - Forge 47.4.10
 - Java 17
-- The same mod version installed on both client and server
+- GeckoLib 4.8.4 or a compatible GeckoLib 4.x release
+- The same Funny Cat Stick and GeckoLib versions installed on both client and server
 
-Place `funny_cat_stick-0.2.0.jar` from the release page in both the client and server `mods` directories, then start the game.
-
-## Development and testing
-
-```powershell
-.\gradlew.bat build
-.\gradlew.bat runServer
-.\gradlew.bat runClientPlayer1
-.\gradlew.bat runClientPlayer2
-.\gradlew.bat stopLocalServer
-```
-
-See [MULTIPLAYER_TESTING.md](MULTIPLAYER_TESTING.md) for multiplayer testing details.
+Download `funny_cat_stick-0.3.0.jar` from Releases and place it together with the Minecraft 1.20.1 Forge build of GeckoLib in both the client and server `mods` directories.
 
 ## License
 
