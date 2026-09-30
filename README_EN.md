@@ -2,19 +2,15 @@
 
 English | [简体中文](README.md)
 
-Funny Cat Stick is a multiplayer content mod for Minecraft 1.20.1 Forge, centered on chat pranks, personality enchantments, and an animated NPC.
+Funny Cat Stick is a multiplayer content mod for Minecraft 1.20.1 Forge featuring chat pranks, personality enchantments, food, and an animated NPC.
 
 ## Mod content
 
-- The single-use Funny Cat Stick applies a catgirl chat effect to another player while preserving their original message.
-- Personality enchantments change the resulting chat style. The mod includes both normal enchantments obtainable through vanilla-style sources and a special treasure enchantment.
-- Effects persist through death and reconnects and notify affected players as their remaining time approaches zero.
-- A special personality can play dedicated music controlled by server administrators; only the relevant players hear it.
-- Ordinary chest loot has a small chance to gain one additional Funny Cat Stick.
-- Adds the animated NPC `dswhale` (大肥鱼) and a Creative-mode spawn egg. Dswhale supports basic activity, looking, opening doors, returning home, and sleeping at night.
-- Newly generated villages in the `#minecraft:village` structure tag can receive a nearby dswhale residence. This also supports modded villages that correctly use the tag.
-- Each residence contains one home-bound dswhale and a dedicated loot chest.
-- Simplified Chinese and English are supported.
+- The Funny Cat Stick, multiplayer chat effects, and several personality enchantments.
+- Special content such as Ji Ni Tai Mei, dedicated music, and related server settings.
+- Cooked rice, fragrant rice, iron pots, and their crafting and food content.
+- The animated dswhale NPC, village residences, daily behavior, and staged trading.
+- Loot integration, persistent progress, and Simplified Chinese and English language support.
 
 ## Administrator commands
 
@@ -49,12 +45,12 @@ Examples:
 ## Requirements and installation
 
 - Minecraft 1.20.1
-- Forge 47.4.10
+- Forge 47.3.22 or a newer Forge 47.x release
 - Java 17
-- GeckoLib 4.8.4 or a compatible GeckoLib 4.x release
+- GeckoLib 4.8.2 or a newer GeckoLib 4.x release
 - The same Funny Cat Stick and GeckoLib versions installed on both client and server
 
-Download `funny_cat_stick-0.3.0.jar` from Releases and place it together with the Minecraft 1.20.1 Forge build of GeckoLib in both the client and server `mods` directories.
+Download `funny_cat_stick-0.3.1.jar` from Releases and place it together with the Minecraft 1.20.1 Forge build of GeckoLib in both the client and server `mods` directories.
 
 ## License
 

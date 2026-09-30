@@ -13,6 +13,7 @@ import software.bernie.geckolib.model.GeoModel;
 public final class DswhaleModel extends GeoModel<DswhaleEntity> {
 
     private static final String HEAD_BONE = "head";
+    private static final String IRON_POT_BONE = "iron_pot";
     private static final float MAX_HEAD_YAW = 60.0F;
     private static final float MAX_HEAD_PITCH = 45.0F;
 
@@ -41,6 +42,11 @@ public final class DswhaleModel extends GeoModel<DswhaleEntity> {
     @Override
     public void setCustomAnimations(DswhaleEntity animatable, long instanceId,
                                     AnimationState<DswhaleEntity> animationState) {
+        CoreGeoBone ironPot = getAnimationProcessor().getBone(IRON_POT_BONE);
+        if (ironPot != null) {
+            ironPot.setHidden(!animatable.isWearingIronPot());
+        }
+
         if (animatable.isSleeping()) {
             return;
         }

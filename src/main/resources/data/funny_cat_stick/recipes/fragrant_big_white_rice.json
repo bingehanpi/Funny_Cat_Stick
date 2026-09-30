@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": {
+    "item": "funny_cat_stick:big_white_rice"
+  },
+  "result": "funny_cat_stick:fragrant_big_white_rice",
+  "experience": 0.35,
+  "cookingtime": 200
+}

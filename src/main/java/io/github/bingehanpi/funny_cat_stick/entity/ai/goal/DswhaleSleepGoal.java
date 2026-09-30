@@ -41,6 +41,7 @@ public final class DswhaleSleepGoal extends Goal {
     public boolean canUse() {
         if (mob.level().isClientSide
                 || mob.isSleeping()
+                || mob.isTrading()
                 || !mob.canStartSleepingNow()
                 || !mob.level().isNight()
                 || mob.level().getGameTime() < nextStartTime) {
@@ -65,7 +66,7 @@ public final class DswhaleSleepGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        if (bedPos == null || !mob.level().isNight()) {
+        if (bedPos == null || !mob.level().isNight() || (!mob.isSleeping() && mob.isTrading())) {
             return false;
         }
 

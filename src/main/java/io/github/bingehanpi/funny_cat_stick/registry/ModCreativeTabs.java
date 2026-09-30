@@ -23,6 +23,11 @@ public final class ModCreativeTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.FUNNY_CAT_STICK.get());
                         output.accept(ModItems.DSWHALE_SPAWN_EGG.get());
+                        output.accept(ModItems.BIG_WHITE_RICE.get());
+                        output.accept(ModItems.POT_OF_WHITE_RICE.get());
+                        output.accept(ModItems.IRON_POT.get());
+                        output.accept(ModItems.FRAGRANT_BIG_WHITE_RICE.get());
+                        output.accept(ModItems.POT_OF_FRAGRANT_RICE.get());
                         for (RegistryObject<net.minecraft.world.item.enchantment.Enchantment> enchantment
                                 : ModEnchantments.PERSONALITY_ENCHANTMENTS) {
                             output.accept(EnchantedBookItem.createForEnchantment(

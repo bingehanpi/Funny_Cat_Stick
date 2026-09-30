@@ -137,7 +137,6 @@ repositories {
         url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
         content {
             includeGroupByRegex('software\\.bernie.*')
-            includeGroup('com.eliotlash.mclib')
         }
     }
 
@@ -156,7 +155,7 @@ dependencies {
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
-    implementation "com.eliotlash.mclib:mclib:${mclib_version}"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
@@ -233,6 +232,15 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+tasks.named('test', Test).configure {
+    def testRunDirectory = layout.buildDirectory.dir('test-run')
+    useJUnitPlatform()
+    workingDir testRunDirectory
+    doFirst {
+        testRunDirectory.get().asFile.mkdirs()
+    }
 }
 
 tasks.register('stopLocalServer', Exec) {

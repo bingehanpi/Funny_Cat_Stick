@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "food",
+  "ingredients": [
+    {
+      "item": "funny_cat_stick:iron_pot"
+    },
+    {
+      "item": "funny_cat_stick:big_white_rice"
+    }
+  ],
+  "result": {
+    "item": "funny_cat_stick:pot_of_white_rice"
+  }
+}

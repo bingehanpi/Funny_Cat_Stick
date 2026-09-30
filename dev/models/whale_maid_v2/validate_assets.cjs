@@ -35,7 +35,10 @@ for (const b of model.bones) {
     }
   }
 }
-assert.equal(cubes, source.elements.length); assert.equal(cubes, 548); assert.equal(names.size, 39);
+assert.equal(cubes, source.elements.length); assert.equal(cubes, 559); assert.equal(names.size, 40);
+const pot = model.bones.find(b => b.name === 'iron_pot');
+assert.equal(pot.parent, 'head');
+assert.equal(pot.cubes.length, 11);
 assert(names.has('eyelid_left') && names.has('eyelid_right'));
 const texture = source.textures.find(t => t.name === 'whale_maid_v2.png');
 assert(texture.source.startsWith('data:image/png;base64,'));
@@ -87,8 +90,7 @@ for (const previous of before.animations) {
   }
 }
 const beforeWalk=read(path.join(__dirname,'backups/before_walk_blink/whale_maid_v2.bbmodel'));
-assert.deepEqual(source.elements,beforeWalk.elements,'Geometry changed during walk-only edit');
-assert.equal(texture.source,beforeWalk.textures.find(t=>t.name===texture.name).source,'Texture changed during walk-only edit');
+assert.deepEqual(source.elements.slice(0, beforeWalk.elements.length),beforeWalk.elements,'Original geometry changed');
 for(const previous of beforeWalk.animations.filter(a=>!a.name.endsWith('.walk'))) {
   const current=source.animations.find(a=>a.name===previous.name);
   assert.equal(current.length,previous.length);assert.equal(current.loop,previous.loop);
@@ -122,8 +124,7 @@ for (const bone of Object.values(blink.bones)) {
 }
 const beforeSleep=read(path.join(__dirname,'backups/before_sleep/whale_maid_v2.bbmodel'));
 const beforeSleepExport=read(path.join(__dirname,'backups/before_sleep/whale_maid_v2.animation.json'));
-assert.deepEqual(source.elements,beforeSleep.elements,'Sleep edit changed model geometry');
-assert.equal(texture.source,beforeSleep.textures.find(t=>t.name===texture.name).source,'Sleep edit changed texture');
+assert.deepEqual(source.elements.slice(0, beforeSleep.elements.length),beforeSleep.elements,'Original geometry changed');
 for(const previous of beforeSleep.animations) {
   const current=source.animations.find(a=>a.name===previous.name);
   assert.equal(current.length,previous.length);assert.equal(current.loop,previous.loop);
@@ -140,8 +141,7 @@ for(const v of Object.values(sleep.bones.root.position))assert.deepEqual(vector(
 assert(Object.values(sleep.bones.chest.scale).some(v=>vector(v)[2]>1.02),'Missing breathing motion');
 const beforeRoot=read(path.join(__dirname,'backups/before_sleep_root_identity/whale_maid_v2.bbmodel'));
 const beforeRootExport=read(path.join(__dirname,'backups/before_sleep_root_identity/whale_maid_v2.animation.json'));
-assert.deepEqual(source.elements,beforeRoot.elements);
-assert.deepEqual(source.textures,beforeRoot.textures);
+assert.deepEqual(source.elements.slice(0, beforeRoot.elements.length),beforeRoot.elements);
 for(const previous of beforeRoot.animations) {
   const current=source.animations.find(a=>a.name===previous.name);
   assert.equal(current.length,previous.length);assert.equal(current.loop,previous.loop);
@@ -161,6 +161,19 @@ for(const previous of beforeRoot.animations) {
     }
   }
   assert.deepEqual(anim.animations[previous.name],expectedExport,'Unexpected exported animation change');
+}
+const beforePot = read(path.join(__dirname, 'backups/before_iron_pot/whale_maid_v2.bbmodel'));
+const beforePotGeo = read(path.join(__dirname, 'backups/before_iron_pot/whale_maid_v2.geo.json'))['minecraft:geometry'][0];
+const beforePotAnimation = fs.readFileSync(path.join(__dirname, 'backups/before_iron_pot/whale_maid_v2.animation.json'));
+assert.deepEqual(source.elements.slice(0, beforePot.elements.length), beforePot.elements, 'Original cubes/UV changed during iron pot edit');
+assert.deepEqual(model.bones.filter(b => b.name !== 'iron_pot'), beforePotGeo.bones, 'Original exported bones changed during iron pot edit');
+assert.equal(source.elements.length - beforePot.elements.length, 11, 'Unexpected added cube count');
+assert(fs.readFileSync(path.join(assets, 'animations/whale_maid_v2.animation.json')).equals(beforePotAnimation), 'Animation export changed during iron pot edit');
+for (const previous of beforePot.animations) {
+  const current = source.animations.find(a => a.name === previous.name);
+  assert.equal(current.length, previous.length);
+  assert.equal(current.loop, previous.loop);
+  assert.deepEqual(current.animators, previous.animators, 'Animation keyframes changed during iron pot edit: '+previous.name);
 }
 const baseline = {
   'dev/models/whale_maid/whale_maid.bbmodel':'404C969B740FB73DB0182C0EB29D14CD2B1DB69C0B43C5CC1594D355667DF25C',

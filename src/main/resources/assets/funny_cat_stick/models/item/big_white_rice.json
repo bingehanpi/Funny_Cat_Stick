@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "funny_cat_stick:item/big_white_rice"
+  }
+}

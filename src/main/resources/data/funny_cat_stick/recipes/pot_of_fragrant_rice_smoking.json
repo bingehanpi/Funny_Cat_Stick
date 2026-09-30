@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": {
+    "item": "funny_cat_stick:pot_of_white_rice"
+  },
+  "result": "funny_cat_stick:pot_of_fragrant_rice",
+  "experience": 0.35,
+  "cookingtime": 100
+}
