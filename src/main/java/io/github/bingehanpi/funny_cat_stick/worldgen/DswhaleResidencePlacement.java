@@ -94,6 +94,72 @@ public final class DswhaleResidencePlacement {
         return transform(plan.templateOrigin(), placementSettings(plan.rotation()), HOME_ANCHOR);
     }
 
+    public static CommandPlacementResult placeAt(ServerLevel level, BlockPos templateOrigin) {
+        if (!level.getServer().isSameThread()) {
+            throw new IllegalStateException("Dswhale residences must be placed on the server thread");
+        }
+
+        Optional<StructureTemplate> template = level.getStructureManager().get(TEMPLATE_ID);
+        if (template.isEmpty()) {
+            return CommandPlacementResult.TEMPLATE_MISSING;
+        }
+
+        DswhaleVillageSavedData.PlacementPlan plan = new DswhaleVillageSavedData.PlacementPlan(
+                templateOrigin.immutable(),
+                Rotation.NONE
+        );
+        if (DswhaleVillageSavedData.get(level).hasRecordedResidence(plan)) {
+            return CommandPlacementResult.ALREADY_RECORDED;
+        }
+
+        StructurePlaceSettings settings = placementSettings(plan.rotation());
+        BoundingBox residenceBox = template.get().getBoundingBox(settings, plan.templateOrigin());
+        if (residenceBox.minY() < level.getMinBuildHeight()
+                || residenceBox.maxY() >= level.getMaxBuildHeight()) {
+            return CommandPlacementResult.OUTSIDE_BUILD_HEIGHT;
+        }
+
+        loadChunks(level, residenceBox);
+        CriticalPositions positions = criticalPositions(plan.templateOrigin(), settings);
+        List<BlockSnapshot> snapshot = captureBlocks(level, residenceBox);
+        try {
+            boolean placed = template.get().placeInWorld(
+                    level,
+                    plan.templateOrigin(),
+                    plan.templateOrigin(),
+                    settings,
+                    RandomSource.create(level.getSeed() ^ plan.templateOrigin().asLong()),
+                    2
+            );
+            ensureLootChest(level, positions.chest());
+            if (!placed || !hasCompleteStructure(level, positions)) {
+                restoreBlocks(level, snapshot);
+                return CommandPlacementResult.INCOMPLETE_TEMPLATE;
+            }
+
+            AttemptResult result = finishResidentAndState(
+                    level,
+                    new ChunkPos(plan.templateOrigin()),
+                    positions,
+                    plan,
+                    true
+            );
+            if (result != AttemptResult.PLACED) {
+                restoreBlocks(level, snapshot);
+                return CommandPlacementResult.RESIDENT_FAILED;
+            }
+            return CommandPlacementResult.PLACED;
+        } catch (RuntimeException exception) {
+            restoreBlocks(level, snapshot);
+            LOGGER.error(
+                    "Failed to place commanded dswhale residence at {}",
+                    plan.templateOrigin().toShortString(),
+                    exception
+            );
+            return CommandPlacementResult.EXCEPTION;
+        }
+    }
+
     public static void scheduleIfPending(ServerLevel level, ChunkPos startChunk) {
         MinecraftServer server = level.getServer();
         if (!server.isSameThread()) {
@@ -547,7 +613,7 @@ public final class DswhaleResidencePlacement {
         CriticalPositions positions = criticalPositions(plan.templateOrigin(), settings);
         boolean completeStructure = hasCompleteStructure(level, positions);
         if (completeStructure) {
-            return finishResidentAndState(level, startChunk, positions, plan.rotation());
+            return finishResidentAndState(level, startChunk, positions, plan, false);
         }
 
         HorizontalCandidate horizontal = new HorizontalCandidate(
@@ -608,7 +674,8 @@ public final class DswhaleResidencePlacement {
                     level,
                     startChunk,
                     positions,
-                    plan.rotation()
+                    plan,
+                    false
             );
             if (result != AttemptResult.PLACED) {
                 restoreBlocks(level, snapshot);
@@ -631,7 +698,8 @@ public final class DswhaleResidencePlacement {
             ServerLevel level,
             ChunkPos startChunk,
             CriticalPositions positions,
-            Rotation rotation
+            DswhaleVillageSavedData.PlacementPlan plan,
+            boolean additionalResidence
     ) {
         List<DswhaleEntity> existing = level.getEntitiesOfClass(
                 DswhaleEntity.class,
@@ -643,13 +711,14 @@ public final class DswhaleResidencePlacement {
         );
         if (!existing.isEmpty()) {
             existing.stream().skip(1).forEach(DswhaleEntity::discard);
-            DswhaleVillageSavedData.get(level).markPlaced(startChunk);
-            return AttemptResult.PLACED;
+            return recordCompletedPlacement(level, startChunk, plan, additionalResidence)
+                    ? AttemptResult.PLACED
+                    : AttemptResult.NO_ACTION;
         }
 
         DswhaleEntity resident = ModEntities.DSWHALE.get().create(level);
         if (resident == null) {
-            fail(level, startChunk, "the dswhale entity could not be created");
+            failIfNatural(level, startChunk, additionalResidence, "the dswhale entity could not be created");
             return AttemptResult.FAILED;
         }
 
@@ -674,12 +743,13 @@ public final class DswhaleResidencePlacement {
                 || !level.noCollision(resident)
                 || !level.addFreshEntity(resident)) {
             resident.discard();
-            fail(level, startChunk, "the bound resident could not be initialized safely");
+            failIfNatural(level, startChunk, additionalResidence,
+                    "the bound resident could not be initialized safely");
             return AttemptResult.FAILED;
         }
 
         try {
-            if (!DswhaleVillageSavedData.get(level).markPlaced(startChunk)) {
+            if (!recordCompletedPlacement(level, startChunk, plan, additionalResidence)) {
                 resident.discard();
                 return AttemptResult.NO_ACTION;
             }
@@ -689,15 +759,37 @@ public final class DswhaleResidencePlacement {
         }
 
         LOGGER.info(
-                "Placed dswhale residence for village [{}, {}] at [{}, {}, {}] with rotation {}",
-                startChunk.x,
-                startChunk.z,
+                "Placed {}dswhale residence at [{}, {}, {}] with rotation {}",
+                additionalResidence ? "commanded " : "",
                 positions.home().getX(),
                 positions.home().getY(),
                 positions.home().getZ(),
-                rotation.name()
+                plan.rotation().name()
         );
         return AttemptResult.PLACED;
+    }
+
+    private static boolean recordCompletedPlacement(
+            ServerLevel level,
+            ChunkPos startChunk,
+            DswhaleVillageSavedData.PlacementPlan plan,
+            boolean additionalResidence
+    ) {
+        DswhaleVillageSavedData data = DswhaleVillageSavedData.get(level);
+        return additionalResidence
+                ? data.recordAdditionalResidence(plan)
+                : data.markPlaced(startChunk);
+    }
+
+    private static void failIfNatural(
+            ServerLevel level,
+            ChunkPos startChunk,
+            boolean additionalResidence,
+            String reason
+    ) {
+        if (!additionalResidence) {
+            fail(level, startChunk, reason);
+        }
     }
 
     private static CriticalPositions criticalPositions(BlockPos origin, StructurePlaceSettings settings) {
@@ -838,6 +930,18 @@ public final class DswhaleResidencePlacement {
         return true;
     }
 
+    private static void loadChunks(ServerLevel level, BoundingBox box) {
+        int minChunkX = SectionRange.minChunk(box.minX());
+        int maxChunkX = SectionRange.maxChunk(box.maxX());
+        int minChunkZ = SectionRange.minChunk(box.minZ());
+        int maxChunkZ = SectionRange.maxChunk(box.maxZ());
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+                level.getChunk(chunkX, chunkZ);
+            }
+        }
+    }
+
     private static StructurePlaceSettings placementSettings(Rotation rotation) {
         return new StructurePlaceSettings()
                 .setMirror(Mirror.NONE)
@@ -872,6 +976,16 @@ public final class DswhaleResidencePlacement {
         FAILED,
         WAITING_FOR_CHUNKS,
         NO_ACTION
+    }
+
+    public enum CommandPlacementResult {
+        PLACED,
+        TEMPLATE_MISSING,
+        ALREADY_RECORDED,
+        OUTSIDE_BUILD_HEIGHT,
+        INCOMPLETE_TEMPLATE,
+        RESIDENT_FAILED,
+        EXCEPTION
     }
 
     private record TaskKey(ResourceKey<Level> dimension, long startChunk) {

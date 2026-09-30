@@ -23,6 +23,7 @@ Funny Cat Stick 是一个适用于 Minecraft 1.20.1 Forge 的多人趣味内容�
 /funnycatstick music
 /funnycatstick music <true|false>
 /fcs locate dswhale_residence
+/fcs place dswhale_residence <x> <y> <z>
 ```
 
 - `tame`：直接为一个或多个目标玩家赋予经典性格的逗猫棒效果，并把指定玩家设为主人。
@@ -31,6 +32,7 @@ Funny Cat Stick 是一个适用于 Minecraft 1.20.1 Forge 的多人趣味内容�
 - `music`：查询全服“及你太美”音乐开关。
 - `music true|false`：开启或关闭音乐播放。默认值为 `false`，设置保存在当前世界中。
 - `fcs locate dswhale_residence`：查找当前世界数据中距离执行位置最近、已经成功生成的大肥鱼住宅，并返回可点击的坐标。该命令不会查找尚未生成的住宅，也不会追溯旧区块。
+- `fcs place dswhale_residence <x> <y> <z>`：以给定坐标作为模板原点，在主世界直接生成完整的大肥鱼住宅、战利品箱和绑定住所的大肥鱼。支持绝对坐标和 `~` 相对坐标；生成结果会按自然生成住宅记录，并可被 `locate` 查询。该命令会覆盖模板范围内的方块，请先确认目标区域。
 
 示例：
 
@@ -40,6 +42,7 @@ Funny Cat Stick 是一个适用于 Minecraft 1.20.1 Forge 的多人趣味内容�
 /funnycatstick reduce PlayerB 5m
 /funnycatstick music true
 /fcs locate dswhale_residence
+/fcs place dswhale_residence ~ ~ ~
 ```
 
 ## 安装要求

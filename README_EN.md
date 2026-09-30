@@ -23,6 +23,7 @@ The following release commands require permission level 2 or above. Player argum
 /funnycatstick music
 /funnycatstick music <true|false>
 /fcs locate dswhale_residence
+/fcs place dswhale_residence <x> <y> <z>
 ```
 
 - `tame`: applies the classic Funny Cat Stick effect to one or more targets and assigns the specified player as their owner.
@@ -31,6 +32,7 @@ The following release commands require permission level 2 or above. Player argum
 - `music`: reports the server-wide Ji Ni Tai Mei music setting.
 - `music true|false`: enables or disables music playback. It defaults to `false` and is saved with the current world.
 - `fcs locate dswhale_residence`: finds the nearest successfully generated dswhale residence recorded in the current world data and returns clickable coordinates. It does not find residences that have not generated and does not retroactively scan old chunks.
+- `fcs place dswhale_residence <x> <y> <z>`: uses the coordinates as the template origin and directly generates a complete residence, loot chest, and home-bound dswhale in the Overworld. Absolute and `~` relative coordinates are supported. The result is recorded like a naturally generated residence and can be found by `locate`. The command replaces blocks inside the template area, so check the destination first.
 
 Examples:
 
@@ -40,6 +42,7 @@ Examples:
 /funnycatstick reduce PlayerB 5m
 /funnycatstick music true
 /fcs locate dswhale_residence
+/fcs place dswhale_residence ~ ~ ~
 ```
 
 ## Requirements and installation

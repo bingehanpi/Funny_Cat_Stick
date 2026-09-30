@@ -64,6 +64,33 @@ final class DswhaleVillageSavedDataTest {
     }
 
     @Test
+    void roundTripsAdditionalResidencesAndCombinesThemWithNaturalPlacements() {
+        ChunkPos villageChunk = new ChunkPos(2, -4);
+        DswhaleVillageSavedData.PlacementPlan natural = new DswhaleVillageSavedData.PlacementPlan(
+                new BlockPos(40, 70, -50),
+                Rotation.CLOCKWISE_90
+        );
+        DswhaleVillageSavedData.PlacementPlan commanded = new DswhaleVillageSavedData.PlacementPlan(
+                new BlockPos(160, 64, 240),
+                Rotation.NONE
+        );
+        DswhaleVillageSavedData data = new DswhaleVillageSavedData();
+        data.recordIfAbsent(villageChunk, DswhaleVillageSavedData.Status.PENDING);
+        data.setPlacementPlan(villageChunk, natural.templateOrigin(), natural.rotation());
+        data.markPlaced(villageChunk);
+
+        assertTrue(data.recordAdditionalResidence(commanded));
+        assertFalse(data.recordAdditionalResidence(commanded));
+        assertTrue(data.hasRecordedResidence(natural));
+        assertTrue(data.hasRecordedResidence(commanded));
+
+        DswhaleVillageSavedData restored = DswhaleVillageSavedData.load(data.save(new CompoundTag()));
+        assertEquals(2, restored.placedResidences().size());
+        assertTrue(restored.placedResidences().contains(natural));
+        assertTrue(restored.placedResidences().contains(commanded));
+    }
+
+    @Test
     void ignoresMalformedAndUnknownSavedRecords() {
         CompoundTag root = new CompoundTag();
         ListTag villages = new ListTag();

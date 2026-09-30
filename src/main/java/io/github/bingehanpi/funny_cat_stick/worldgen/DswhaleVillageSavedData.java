@@ -30,8 +30,10 @@ public final class DswhaleVillageSavedData extends SavedData {
     private static final String ORIGIN_TAG = "Origin";
     private static final String ROTATION_TAG = "Rotation";
     private static final String FAILURE_REASON_TAG = "FailureReason";
+    private static final String ADDITIONAL_RESIDENCES_TAG = "AdditionalResidences";
 
     private final Map<Long, VillageRecord> villages = new LinkedHashMap<>();
+    private final List<PlacementPlan> additionalResidences = new ArrayList<>();
 
     public static DswhaleVillageSavedData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(
@@ -64,6 +66,13 @@ public final class DswhaleVillageSavedData extends SavedData {
                 );
             });
         }
+        ListTag additionalResidences = compound.getList(ADDITIONAL_RESIDENCES_TAG, Tag.TAG_COMPOUND);
+        for (Tag tag : additionalResidences) {
+            PlacementPlan placement = readPlacementTag((CompoundTag) tag);
+            if (placement != null && !data.additionalResidences.contains(placement)) {
+                data.additionalResidences.add(placement);
+            }
+        }
         return data;
     }
 
@@ -77,10 +86,7 @@ public final class DswhaleVillageSavedData extends SavedData {
             village.putInt(Z_TAG, startChunk.z);
             village.putString(STATUS_TAG, record.status().serializedName());
             if (record.placement() != null) {
-                CompoundTag placement = new CompoundTag();
-                placement.put(ORIGIN_TAG, NbtUtils.writeBlockPos(record.placement().templateOrigin()));
-                placement.putString(ROTATION_TAG, record.placement().rotation().name());
-                village.put(PLACEMENT_TAG, placement);
+                village.put(PLACEMENT_TAG, writePlacement(record.placement()));
             }
             if (record.failureReason() != null && !record.failureReason().isBlank()) {
                 village.putString(FAILURE_REASON_TAG, record.failureReason());
@@ -88,6 +94,10 @@ public final class DswhaleVillageSavedData extends SavedData {
             villagesTag.add(village);
         });
         compound.put(VILLAGES_TAG, villagesTag);
+
+        ListTag additionalResidencesTag = new ListTag();
+        additionalResidences.forEach(placement -> additionalResidencesTag.add(writePlacement(placement)));
+        compound.put(ADDITIONAL_RESIDENCES_TAG, additionalResidencesTag);
         return compound;
     }
 
@@ -193,11 +203,42 @@ public final class DswhaleVillageSavedData extends SavedData {
         return List.copyOf(entries);
     }
 
+    public boolean recordAdditionalResidence(PlacementPlan placement) {
+        PlacementPlan immutable = new PlacementPlan(
+                placement.templateOrigin().immutable(),
+                placement.rotation()
+        );
+        if (placedResidences().contains(immutable)) {
+            return false;
+        }
+        additionalResidences.add(immutable);
+        setDirty();
+        return true;
+    }
+
+    public boolean hasRecordedResidence(PlacementPlan placement) {
+        return placedResidences().contains(placement);
+    }
+
+    public List<PlacementPlan> placedResidences() {
+        List<PlacementPlan> placements = new ArrayList<>(additionalResidences);
+        villages.values().stream()
+                .filter(record -> record.status() == Status.PLACED)
+                .map(VillageRecord::placement)
+                .filter(java.util.Objects::nonNull)
+                .filter(placement -> !placements.contains(placement))
+                .forEach(placements::add);
+        return List.copyOf(placements);
+    }
+
     private static PlacementPlan readPlacement(CompoundTag village) {
         if (!village.contains(PLACEMENT_TAG, Tag.TAG_COMPOUND)) {
             return null;
         }
-        CompoundTag placement = village.getCompound(PLACEMENT_TAG);
+        return readPlacementTag(village.getCompound(PLACEMENT_TAG));
+    }
+
+    private static PlacementPlan readPlacementTag(CompoundTag placement) {
         if (!placement.contains(ORIGIN_TAG, Tag.TAG_COMPOUND)
                 || !placement.contains(ROTATION_TAG, Tag.TAG_STRING)) {
             return null;
@@ -209,6 +250,13 @@ public final class DswhaleVillageSavedData extends SavedData {
         } catch (IllegalArgumentException exception) {
             return null;
         }
+    }
+
+    private static CompoundTag writePlacement(PlacementPlan placementPlan) {
+        CompoundTag placement = new CompoundTag();
+        placement.put(ORIGIN_TAG, NbtUtils.writeBlockPos(placementPlan.templateOrigin()));
+        placement.putString(ROTATION_TAG, placementPlan.rotation().name());
+        return placement;
     }
 
     private record VillageRecord(Status status, PlacementPlan placement, String failureReason) {
