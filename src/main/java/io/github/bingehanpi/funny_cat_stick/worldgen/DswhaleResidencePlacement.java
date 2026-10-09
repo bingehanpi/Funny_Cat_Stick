@@ -28,9 +28,11 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
@@ -62,6 +64,8 @@ public final class DswhaleResidencePlacement {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final ResourceLocation TEMPLATE_ID =
             ResourceLocation.fromNamespaceAndPath(FunnyCatStick.MOD_ID, "dswhale_architecture");
+    private static final ResourceLocation WORLDGEN_STRUCTURE_ID =
+            ResourceLocation.fromNamespaceAndPath(FunnyCatStick.MOD_ID, "dswhale_residence");
     private static final ResourceLocation LOOT_TABLE_ID =
             ResourceLocation.fromNamespaceAndPath(FunnyCatStick.MOD_ID, "chests/dswhale_architecture");
 
@@ -85,6 +89,8 @@ public final class DswhaleResidencePlacement {
     private static final int MAX_LOAD_RETRIES = 5;
 
     private static final Map<MinecraftServer, Map<TaskKey, PendingTask>> PENDING_TASKS =
+            new WeakHashMap<>();
+    private static final Map<MinecraftServer, Map<TaskKey, GeneratedPendingTask>> GENERATED_TASKS =
             new WeakHashMap<>();
 
     private DswhaleResidencePlacement() {
@@ -194,7 +200,74 @@ public final class DswhaleResidencePlacement {
         }
     }
 
+    public static void scheduleGeneratedResidence(ServerLevel level, ChunkAccess loadedChunk) {
+        MinecraftServer server = level.getServer();
+        if (!server.isSameThread()) {
+            server.execute(() -> scheduleGeneratedResidence(level, loadedChunk));
+            return;
+        }
+        if (!Level.OVERWORLD.equals(level.dimension())) {
+            return;
+        }
+
+        Registry<Structure> structures = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
+        Structure residence = structures.get(WORLDGEN_STRUCTURE_ID);
+        if (residence == null) {
+            return;
+        }
+
+        scheduleGeneratedStart(level, loadedChunk.getStartForStructure(residence));
+        for (long startChunkLong : loadedChunk.getReferencesForStructure(residence)) {
+            ChunkPos startChunk = new ChunkPos(startChunkLong);
+            LevelChunk loadedStart = level.getChunkSource().getChunkNow(startChunk.x, startChunk.z);
+            if (loadedStart != null) {
+                scheduleGeneratedStart(level, loadedStart.getStartForStructure(residence));
+            }
+        }
+    }
+
+    private static void scheduleGeneratedStart(ServerLevel level, StructureStart start) {
+        if (start == null || !start.isValid()) {
+            return;
+        }
+
+        Optional<PoolElementStructurePiece> rootPiece = start.getPieces().stream()
+                .filter(PoolElementStructurePiece.class::isInstance)
+                .map(PoolElementStructurePiece.class::cast)
+                .findFirst();
+        if (rootPiece.isEmpty()) {
+            LOGGER.warn(
+                    "Generated dswhale residence at chunk [{}, {}] has no jigsaw root piece",
+                    start.getChunkPos().x,
+                    start.getChunkPos().z
+            );
+            return;
+        }
+
+        DswhaleVillageSavedData.PlacementPlan plan = new DswhaleVillageSavedData.PlacementPlan(
+                rootPiece.get().getPosition().immutable(),
+                rootPiece.get().getRotation()
+        );
+        if (DswhaleVillageSavedData.get(level).hasRecordedResidence(plan)) {
+            return;
+        }
+
+        MinecraftServer server = level.getServer();
+        Map<TaskKey, GeneratedPendingTask> tasks =
+                GENERATED_TASKS.computeIfAbsent(server, ignored -> new HashMap<>());
+        TaskKey key = new TaskKey(level.dimension(), start.getChunkPos().toLong());
+        tasks.putIfAbsent(
+                key,
+                new GeneratedPendingTask(plan, server.getTickCount() + RETRY_DELAY_TICKS, 0)
+        );
+    }
+
     public static void tick(MinecraftServer server) {
+        tickVillageTasks(server);
+        tickGeneratedTasks(server);
+    }
+
+    private static void tickVillageTasks(MinecraftServer server) {
         Map<TaskKey, PendingTask> tasks = PENDING_TASKS.get(server);
         if (tasks == null || tasks.isEmpty()) {
             return;
@@ -233,8 +306,101 @@ public final class DswhaleResidencePlacement {
         }
     }
 
+    private static void tickGeneratedTasks(MinecraftServer server) {
+        Map<TaskKey, GeneratedPendingTask> tasks = GENERATED_TASKS.get(server);
+        if (tasks == null || tasks.isEmpty()) {
+            return;
+        }
+
+        int currentTick = server.getTickCount();
+        List<TaskKey> dueTasks = tasks.entrySet().stream()
+                .filter(entry -> entry.getValue().nextAttemptTick() <= currentTick)
+                .map(Map.Entry::getKey)
+                .toList();
+        for (TaskKey key : dueTasks) {
+            GeneratedPendingTask task = tasks.get(key);
+            ServerLevel level = server.getLevel(key.dimension());
+            if (task == null || level == null) {
+                tasks.remove(key);
+                continue;
+            }
+
+            AttemptResult result = initializeGeneratedResidence(level, key, task.plan());
+            if (result != AttemptResult.WAITING_FOR_CHUNKS) {
+                tasks.remove(key);
+                continue;
+            }
+
+            int retries = task.loadRetries() + 1;
+            if (retries >= MAX_LOAD_RETRIES) {
+                tasks.remove(key);
+            } else {
+                tasks.put(
+                        key,
+                        new GeneratedPendingTask(task.plan(), currentTick + RETRY_DELAY_TICKS, retries)
+                );
+            }
+        }
+
+        if (tasks.isEmpty()) {
+            GENERATED_TASKS.remove(server);
+        }
+    }
+
     public static void clear(MinecraftServer server) {
         PENDING_TASKS.remove(server);
+        GENERATED_TASKS.remove(server);
+    }
+
+    private static AttemptResult initializeGeneratedResidence(
+            ServerLevel level,
+            TaskKey key,
+            DswhaleVillageSavedData.PlacementPlan plan
+    ) {
+        if (DswhaleVillageSavedData.get(level).hasRecordedResidence(plan)) {
+            return AttemptResult.NO_ACTION;
+        }
+
+        Optional<StructureTemplate> template = level.getStructureManager().get(TEMPLATE_ID);
+        if (template.isEmpty()) {
+            LOGGER.error("The generated dswhale residence template could not be loaded");
+            return AttemptResult.FAILED;
+        }
+
+        StructurePlaceSettings settings = placementSettings(plan.rotation());
+        BoundingBox residenceBox = template.get().getBoundingBox(settings, plan.templateOrigin());
+        if (!areChunksLoaded(
+                level,
+                residenceBox.minX(),
+                residenceBox.minZ(),
+                residenceBox.maxX(),
+                residenceBox.maxZ()
+        )) {
+            return AttemptResult.WAITING_FOR_CHUNKS;
+        }
+
+        CriticalPositions positions = criticalPositions(plan.templateOrigin(), settings);
+        if (!hasCompleteStructure(level, positions)) {
+            return AttemptResult.WAITING_FOR_CHUNKS;
+        }
+
+        ensureLootChest(level, positions.chest());
+        AttemptResult result = finishResidentAndState(
+                level,
+                new ChunkPos(key.startChunk()),
+                positions,
+                plan,
+                true
+        );
+        if (result == AttemptResult.PLACED) {
+            ChunkPos startChunk = new ChunkPos(key.startChunk());
+            LOGGER.info(
+                    "Initialized world-generated dswhale residence from structure start chunk [{}, {}]",
+                    startChunk.x,
+                    startChunk.z
+            );
+        }
+        return result;
     }
 
     private static AttemptResult attemptPlacement(ServerLevel level, ChunkPos startChunk) {
@@ -759,8 +925,7 @@ public final class DswhaleResidencePlacement {
         }
 
         LOGGER.info(
-                "Placed {}dswhale residence at [{}, {}, {}] with rotation {}",
-                additionalResidence ? "commanded " : "",
+                "Placed dswhale residence at [{}, {}, {}] with rotation {}",
                 positions.home().getX(),
                 positions.home().getY(),
                 positions.home().getZ(),
@@ -992,6 +1157,13 @@ public final class DswhaleResidencePlacement {
     }
 
     private record PendingTask(int nextAttemptTick, int loadRetries) {
+    }
+
+    private record GeneratedPendingTask(
+            DswhaleVillageSavedData.PlacementPlan plan,
+            int nextAttemptTick,
+            int loadRetries
+    ) {
     }
 
     private record HorizontalCandidate(int minX, int minZ, int width, int depth, Rotation rotation) {

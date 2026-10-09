@@ -1,6 +1,13 @@
 {
   "creativetab.funny_cat_stick.funny_cat_stick": "Funny Cat Stick",
+  "block.funny_cat_stick.funny_cat_stick_display_stand": "Funny Cat Stick Display Stand",
+  "tooltip.funny_cat_stick.funny_cat_stick_display_stand": "It seems it can be used for...?",
   "item.funny_cat_stick.funny_cat_stick": "Funny Cat Stick",
+  "item.funny_cat_stick.funny_question_stick": "funny ? stick",
+  "item.funny_cat_stick.anti_meow_potion": "Anti-Meow Potion",
+  "item.funny_cat_stick.unfinished_anti_meow_potion": "Unfinished Anti-Meow Potion",
+  "tooltip.funny_cat_stick.unfinished_anti_meow_potion": "Unfinished, but it seems useful?",
+  "message.funny_cat_stick.question_stick.meow": "(%1$s) : Meow~",
   "item.funny_cat_stick.dswhale_spawn_egg": "dswhale Spawn Egg",
   "item.funny_cat_stick.big_white_rice": "Big Bowl of Rice",
   "item.funny_cat_stick.pot_of_white_rice": "Pot Full of Rice",

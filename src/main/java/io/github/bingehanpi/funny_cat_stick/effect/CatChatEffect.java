@@ -121,6 +121,26 @@ public final class CatChatEffect {
         return newRemaining;
     }
 
+    public static long extend(ServerPlayer player, long amountMillis) {
+        long remaining = getRemainingMillis(player);
+        if (remaining <= 0) {
+            return -1;
+        }
+        if (amountMillis <= 0) {
+            return remaining;
+        }
+
+        CompoundTag data = player.getPersistentData();
+        long expiresAt = data.getLong(EXPIRES_AT_KEY);
+        long newExpiresAt = amountMillis > Long.MAX_VALUE - expiresAt
+                ? Long.MAX_VALUE
+                : expiresAt + amountMillis;
+        long newRemaining = Math.max(0, newExpiresAt - System.currentTimeMillis());
+        data.putLong(EXPIRES_AT_KEY, newExpiresAt);
+        data.putLong(LAST_REMAINING_KEY, newRemaining);
+        return newRemaining;
+    }
+
     public static void tick(ServerPlayer player) {
         CompoundTag data = player.getPersistentData();
         if (!data.contains(EXPIRES_AT_KEY, Tag.TAG_LONG)) {

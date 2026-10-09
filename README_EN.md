@@ -2,15 +2,15 @@
 
 English | [简体中文](README.md)
 
-Funny Cat Stick is a multiplayer content mod for Minecraft 1.20.1 Forge featuring chat pranks, personality enchantments, food, and an animated NPC.
+Funny Cat Stick is a multiplayer content mod for Minecraft 1.20.1 Forge built around funny cat sticks, chat effects, exploration, brewing, and an animated NPC.
 
 ## Mod content
 
-- The Funny Cat Stick, multiplayer chat effects, and several personality enchantments.
-- Special content such as Ji Ni Tai Mei, dedicated music, and related server settings.
-- Cooked rice, fragrant rice, iron pots, and their crafting and food content.
-- The animated dswhale NPC, village residences, daily behavior, and staged trading.
-- Loot integration, persistent progress, and Simplified Chinese and English language support.
+- The Funny Cat Stick, multiplayer chat effects, personality enchantments, and related special content.
+- A display stand that holds four Funny Cat Sticks, plus the rare Funny ? Stick.
+- Anti-Meow Potions and their brewing chain, rice, fragrant rice, iron pots, and related content.
+- The animated dswhale NPC, naturally generated residences, daily behavior, and staged trading.
+- Dedicated music, loot integration, persistent progress, and Simplified Chinese and English language support.
 
 ## Administrator commands
 
@@ -53,7 +53,7 @@ Examples:
 - GeckoLib 4.8.2 or a newer GeckoLib 4.x release
 - The same Funny Cat Stick and GeckoLib versions installed on both client and server
 
-Download `funny_cat_stick-0.3.1.jar` from Releases and place it together with the Minecraft 1.20.1 Forge build of GeckoLib in both the client and server `mods` directories.
+Download `funny_cat_stick-0.4.0.jar` from Releases and place it together with the Minecraft 1.20.1 Forge build of GeckoLib in both the client and server `mods` directories.
 
 ## License
 

@@ -2,15 +2,15 @@
 
 [English](README_EN.md) | 简体中文
 
-Funny Cat Stick 是一个适用于 Minecraft 1.20.1 Forge 的多人趣味内容模组，主要包含聊天整蛊、性格附魔、食物与动画 NPC 内容。
+Funny Cat Stick 是一个适用于 Minecraft 1.20.1 Forge 的多人趣味内容模组，围绕逗猫棒、聊天效果、探索、酿造与动画 NPC 展开。
 
 ## 模组内容
 
-- 逗猫棒、多人聊天效果以及多种性格附魔。
-- “及你太美”等特殊内容、专属音乐和相关服务器设置。
-- 大白饭、香香大白饭、铁锅及对应的制作与食用内容。
-- 动画 NPC“大肥鱼”、村庄住宅、日常行为与分阶段交易系统。
-- 战利品、进度保存，以及简体中文和英文语言支持。
+- 逗猫棒、多人聊天效果、多种性格附魔及相关特殊内容。
+- 可同时陈列四根逗猫棒的展示架，以及稀有物品“逗?棒”。
+- 解喵药水及其酿造过程、大白饭、香香大白饭和铁锅等内容。
+- 动画 NPC“大肥鱼”、自然生成的住宅、日常行为与分阶段交易系统。
+- 专属音乐、战利品、进度保存，以及简体中文和英文语言支持。
 
 ## 管理员命令
 
@@ -53,7 +53,7 @@ Funny Cat Stick 是一个适用于 Minecraft 1.20.1 Forge 的多人趣味内容�
 - GeckoLib 4.8.2 或更高的 GeckoLib 4.x 版本
 - 客户端和服务端均需安装相同版本的 Funny Cat Stick 与 GeckoLib
 
-从 Releases 页面下载 `funny_cat_stick-0.3.1.jar`，与适用 Minecraft 1.20.1 Forge 的 GeckoLib 一同放入客户端和服务端的 `mods` 文件夹。
+从 Releases 页面下载 `funny_cat_stick-0.4.0.jar`，与适用 Minecraft 1.20.1 Forge 的 GeckoLib 一同放入客户端和服务端的 `mods` 文件夹。
 
 ## 许可证
 

@@ -17,7 +17,7 @@ import java.util.Map;
 
 public final class DswhaleVillageDiscovery {
 
-    public static final double CANDIDATE_CHANCE = 0.15D;
+    public static final double CANDIDATE_CHANCE = 0.10D;
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final long X_MULTIPLIER = 0x632BE59BD9B4E019L;

@@ -128,6 +128,17 @@ public final class DswhaleTradeOffers {
         ));
     }
 
+    public static void addDisplayStandOffer(MerchantOffers offers, RandomSource random) {
+        offers.add(new MerchantOffer(
+                new ItemStack(ModItems.FRAGRANT_BIG_WHITE_RICE.get(), between(random, 10, 20)),
+                new ItemStack(ModItems.IRON_POT.get()),
+                new ItemStack(ModItems.FUNNY_CAT_STICK_DISPLAY_STAND.get()),
+                TREASURE_MAX_USES,
+                SECOND_STAGE_XP,
+                0.0F
+        ));
+    }
+
     static List<MineralTrade> mineralTrades() {
         return MINERAL_TRADES;
     }

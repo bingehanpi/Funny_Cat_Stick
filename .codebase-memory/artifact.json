@@ -1,0 +1,11 @@
+{
+    "schema_version": 2,
+    "commit": "e9516fad83ff1735ac854ab5080ebb16de1165f3",
+    "indexed_at": "2026-10-09T09:27:59Z",
+    "project": "funny_cat_stick",
+    "nodes": 2971,
+    "edges": 5341,
+    "original_size": 26083328,
+    "compressed_size": 992440,
+    "compression_level": 9
+}

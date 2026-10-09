@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " L ",
+    "FLF",
+    "SLS"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:cherry_fence"
+    },
+    "L": {
+      "item": "minecraft:cherry_log"
+    },
+    "S": {
+      "item": "minecraft:cherry_slab"
+    }
+  },
+  "result": {
+    "item": "funny_cat_stick:funny_cat_stick_display_stand",
+    "count": 1
+  }
+}

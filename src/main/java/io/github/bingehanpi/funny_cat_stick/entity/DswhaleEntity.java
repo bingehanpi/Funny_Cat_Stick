@@ -82,6 +82,7 @@ public final class DswhaleEntity extends AbstractVillager implements GeoEntity {
     private static final String SECOND_STAGE_TAG = "FunnyCatStickSecondTradeStage";
     private static final String SECOND_STAGE_OFFERS_TAG = "FunnyCatStickSecondStageOffersAdded";
     private static final String TREASURE_OFFER_TAG = "FunnyCatStickTreasureOfferAdded";
+    private static final String DISPLAY_STAND_OFFER_TAG = "FunnyCatStickDisplayStandOfferAdded";
     private static final String LAST_RESTOCK_DAY_TAG = "FunnyCatStickLastRestockDay";
     private static final String WEARING_IRON_POT_TAG = "FunnyCatStickWearingIronPot";
 
@@ -99,6 +100,7 @@ public final class DswhaleEntity extends AbstractVillager implements GeoEntity {
     private boolean secondStageUnlocked;
     private boolean secondStageOffersAdded;
     private boolean treasureOfferAdded;
+    private boolean displayStandOfferAdded;
     private long lastRestockDay = Long.MIN_VALUE;
 
     public DswhaleEntity(EntityType<? extends DswhaleEntity> entityType, Level level) {
@@ -333,12 +335,24 @@ public final class DswhaleEntity extends AbstractVillager implements GeoEntity {
     }
 
     private void ensureTreasureOffer() {
-        if (!secondStageUnlocked || !isWearingIronPot() || treasureOfferAdded || offers == null) {
+        if (!secondStageUnlocked || !isWearingIronPot() || offers == null) {
             return;
         }
-        DswhaleTradeOffers.addTreasureOffer(offers);
-        treasureOfferAdded = true;
-        resendOffersToTradingPlayer();
+
+        boolean offerAdded = false;
+        if (!treasureOfferAdded) {
+            DswhaleTradeOffers.addTreasureOffer(offers);
+            treasureOfferAdded = true;
+            offerAdded = true;
+        }
+        if (!displayStandOfferAdded) {
+            DswhaleTradeOffers.addDisplayStandOffer(offers, random);
+            displayStandOfferAdded = true;
+            offerAdded = true;
+        }
+        if (offerAdded) {
+            resendOffersToTradingPlayer();
+        }
     }
 
     @Override
@@ -452,6 +466,7 @@ public final class DswhaleEntity extends AbstractVillager implements GeoEntity {
         compound.putBoolean(SECOND_STAGE_TAG, secondStageUnlocked);
         compound.putBoolean(SECOND_STAGE_OFFERS_TAG, secondStageOffersAdded);
         compound.putBoolean(TREASURE_OFFER_TAG, treasureOfferAdded);
+        compound.putBoolean(DISPLAY_STAND_OFFER_TAG, displayStandOfferAdded);
         compound.putBoolean(WEARING_IRON_POT_TAG, isWearingIronPot());
         if (lastRestockDay != Long.MIN_VALUE) {
             compound.putLong(LAST_RESTOCK_DAY_TAG, lastRestockDay);
@@ -470,6 +485,7 @@ public final class DswhaleEntity extends AbstractVillager implements GeoEntity {
         }
         secondStageOffersAdded = compound.getBoolean(SECOND_STAGE_OFFERS_TAG);
         treasureOfferAdded = compound.getBoolean(TREASURE_OFFER_TAG);
+        displayStandOfferAdded = compound.getBoolean(DISPLAY_STAND_OFFER_TAG);
         setWearingIronPot(compound.getBoolean(WEARING_IRON_POT_TAG));
         lastRestockDay = compound.contains(LAST_RESTOCK_DAY_TAG, Tag.TAG_ANY_NUMERIC)
                 ? compound.getLong(LAST_RESTOCK_DAY_TAG)

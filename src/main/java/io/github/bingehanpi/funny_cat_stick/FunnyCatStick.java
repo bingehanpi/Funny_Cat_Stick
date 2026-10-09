@@ -3,7 +3,9 @@ package io.github.bingehanpi.funny_cat_stick;
 import io.github.bingehanpi.funny_cat_stick.config.ModServerConfig;
 import io.github.bingehanpi.funny_cat_stick.effect.CatChatTransformations;
 import io.github.bingehanpi.funny_cat_stick.network.ModNetworking;
+import io.github.bingehanpi.funny_cat_stick.registry.ModBlockEntities;
 import io.github.bingehanpi.funny_cat_stick.registry.ModBlocks;
+import io.github.bingehanpi.funny_cat_stick.registry.ModBrewingRecipes;
 import io.github.bingehanpi.funny_cat_stick.registry.ModCreativeTabs;
 import io.github.bingehanpi.funny_cat_stick.registry.ModEnchantments;
 import io.github.bingehanpi.funny_cat_stick.registry.ModEntities;
@@ -31,6 +33,7 @@ public final class FunnyCatStick {
         ModItems.register(modEventBus);
         ModEnchantments.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         ModLootModifiers.register(modEventBus);
         ModSounds.register(modEventBus);
@@ -41,6 +44,7 @@ public final class FunnyCatStick {
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             CatChatTransformations.validateResources();
+            ModBrewingRecipes.register();
             ModNetworking.register();
         });
     }

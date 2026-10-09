@@ -22,6 +22,9 @@ public final class ModCreativeTabs {
                     .icon(() -> ModItems.FUNNY_CAT_STICK.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.FUNNY_CAT_STICK.get());
+                        output.accept(ModItems.FUNNY_CAT_STICK_DISPLAY_STAND.get());
+                        output.accept(ModItems.ANTI_MEOW_POTION.get());
+                        output.accept(ModItems.UNFINISHED_ANTI_MEOW_POTION.get());
                         output.accept(ModItems.DSWHALE_SPAWN_EGG.get());
                         output.accept(ModItems.BIG_WHITE_RICE.get());
                         output.accept(ModItems.POT_OF_WHITE_RICE.get());

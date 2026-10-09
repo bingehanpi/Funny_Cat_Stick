@@ -1,6 +1,13 @@
 {
   "creativetab.funny_cat_stick.funny_cat_stick": "\u9017\u732b\u68d2",
+  "block.funny_cat_stick.funny_cat_stick_display_stand": "\u9017\u732b\u68d2\u5c55\u793a\u67b6",
+  "tooltip.funny_cat_stick.funny_cat_stick_display_stand": "\u4f3c\u4e4e\u53ef\u4ee5\u7528\u4e8e...?",
   "item.funny_cat_stick.funny_cat_stick": "\u9017\u732b\u68d2",
+  "item.funny_cat_stick.funny_question_stick": "\u9017?\u68d2",
+  "item.funny_cat_stick.anti_meow_potion": "\u89e3\u55b5\u836f\u6c34",
+  "item.funny_cat_stick.unfinished_anti_meow_potion": "\u89e3\u55b5\u836f\u6c34-\u534a\u6210\u54c1",
+  "tooltip.funny_cat_stick.unfinished_anti_meow_potion": "\u534a\u6210\u54c1,\u4f3c\u4e4e\u6709\u7528?",
+  "message.funny_cat_stick.question_stick.meow": "(%1$s) : \u55b5\u545c~",
   "item.funny_cat_stick.dswhale_spawn_egg": "\u5927\u80a5\u9c7c\u5237\u602a\u86cb",
   "item.funny_cat_stick.big_white_rice": "\u5927\u767d\u996d",
   "item.funny_cat_stick.pot_of_white_rice": "\u76db\u6ee1\u767d\u996d\u7684\u9505",
