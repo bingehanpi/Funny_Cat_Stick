@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GRG",
+    " C ",
+    "NQN"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "R": {
+      "item": "funny_cat_stick:fragrant_big_white_rice"
+    },
+    "C": {
+      "item": "funny_cat_stick:funny_cat_stick"
+    },
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "Q": {
+      "item": "funny_cat_stick:funny_question_stick"
+    }
+  },
+  "result": {
+    "item": "funny_cat_stick:funny_question_stick",
+    "count": 1
+  }
+}

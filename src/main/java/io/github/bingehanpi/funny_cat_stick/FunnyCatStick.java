@@ -9,6 +9,7 @@ import io.github.bingehanpi.funny_cat_stick.registry.ModBrewingRecipes;
 import io.github.bingehanpi.funny_cat_stick.registry.ModCreativeTabs;
 import io.github.bingehanpi.funny_cat_stick.registry.ModEnchantments;
 import io.github.bingehanpi.funny_cat_stick.registry.ModEntities;
+import io.github.bingehanpi.funny_cat_stick.registry.ModEffects;
 import io.github.bingehanpi.funny_cat_stick.registry.ModItems;
 import io.github.bingehanpi.funny_cat_stick.registry.ModLootModifiers;
 import io.github.bingehanpi.funny_cat_stick.registry.ModSounds;
@@ -30,6 +31,7 @@ public final class FunnyCatStick {
         IEventBus modEventBus = context.getModEventBus();
 
         ModEntities.register(modEventBus);
+        ModEffects.register(modEventBus);
         ModItems.register(modEventBus);
         ModEnchantments.register(modEventBus);
         ModBlocks.register(modEventBus);

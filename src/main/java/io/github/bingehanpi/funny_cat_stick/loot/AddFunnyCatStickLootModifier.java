@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.bingehanpi.funny_cat_stick.registry.ModItems;
 import io.github.bingehanpi.funny_cat_stick.registry.ModLootModifiers;
+import io.github.bingehanpi.funny_cat_stick.loot.pity.CatStickPity;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -31,6 +32,8 @@ public final class AddFunnyCatStickLootModifier extends LootModifier {
     ) {
         ResourceLocation lootTableId = context.getQueriedLootTableId();
         if (!lootTableId.getPath().startsWith("chests/")
+                // Player-owned chest drops are awarded after fill, once per opening, with slot-safe pity.
+                || CatStickPity.suppressesBaseRoll()
                 || generatedLoot.stream().anyMatch(stack -> stack.is(ModItems.FUNNY_CAT_STICK.get()))) {
             return generatedLoot;
         }

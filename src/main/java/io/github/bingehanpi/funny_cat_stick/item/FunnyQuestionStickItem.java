@@ -1,5 +1,6 @@
 package io.github.bingehanpi.funny_cat_stick.item;
 
+import io.github.bingehanpi.funny_cat_stick.stasis.CatgirlStasis;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,6 +21,17 @@ public final class FunnyQuestionStickItem extends Item {
     }
 
     @Override
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getCraftingRemainingItem(ItemStack stack) {
+        // Return only the one consumed ingredient, preserving the original stack's data.
+        return stack.copyWithCount(1);
+    }
+
+    @Override
     public InteractionResult interactLivingEntity(
             ItemStack stack,
             Player player,
@@ -35,6 +47,10 @@ public final class FunnyQuestionStickItem extends Item {
         }
 
         if (!(target.level() instanceof ServerLevel serverLevel)) {
+            return InteractionResult.PASS;
+        }
+
+        if (!CatgirlStasis.apply(target)) {
             return InteractionResult.PASS;
         }
 

@@ -13,6 +13,11 @@ base {
     archivesName = mod_id
 }
 
+mixin {
+    add sourceSets.main, "funny_cat_stick.refmap.json"
+    config "funny_cat_stick.mixins.json"
+}
+
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -140,6 +145,14 @@ repositories {
         }
     }
 
+    if (project.hasProperty('lootrTest')) {
+        maven {
+            name = 'ModrinthLootrTest'
+            url = 'https://api.modrinth.com/maven'
+            content { includeGroup 'maven.modrinth' }
+        }
+    }
+
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
     // flatDir {
@@ -155,7 +168,18 @@ dependencies {
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
+    annotationProcessor "org.spongepowered:mixin:0.8.5"
+    annotationProcessor "com.google.code.gson:gson:2.10.1"
+    annotationProcessor "com.google.guava:guava:31.1-jre"
+    annotationProcessor "org.ow2.asm:asm:9.7.1"
+    annotationProcessor "org.ow2.asm:asm-tree:9.7.1"
+    annotationProcessor "org.ow2.asm:asm-commons:9.7.1"
+    annotationProcessor "org.ow2.asm:asm-util:9.7.1"
     testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
+    // Optional development runtime only; never packaged or required by the released mod.
+    if (project.hasProperty('lootrTest')) {
+        runtimeOnly fg.deobf('maven.modrinth:lootr:0.7.35.94')
+    }
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
@@ -203,7 +227,8 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Title'    : project.name,
                 'Implementation-Version'  : project.jar.archiveVersion,
                 'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'MixinConfigs'            : 'funny_cat_stick.mixins.json'
         ])
     }
 
